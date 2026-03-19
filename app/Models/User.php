@@ -19,10 +19,16 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
     protected $fillable = [
+        // 'lab_id',
+        // 'collection_center_id',
         'name',
         'email',
         'password',
+        'is_approver',
+        'qualification',
+        'signature_path',
     ];
 
     /**
@@ -36,6 +42,7 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'remember_token',
     ];
+
 
     /**
      * Get the attributes that should be cast.
