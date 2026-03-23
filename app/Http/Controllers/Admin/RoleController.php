@@ -9,13 +9,28 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
     public function index(): Response
     {
-        $roles = Role::orderBy('name')->get();
-        return Inertia::render('admin/roles/index', compact('roles'));
+        $query = Role::query();
+
+        if ($q = request('q')) {
+            $query->where('name', 'like', "%{$q}%")->orWhere('slug', 'like', "%{$q}%");
+        }
+
+        if (request()->filled('is_system')) {
+            $query->where('is_system', request('is_system'));
+        }
+
+        $roles = $query->orderBy('name')->paginate(10)->withQueryString();
+
+        return Inertia::render('admin/roles/index', [
+            'roles' => $roles,
+            'filters' => request()->only(['q', 'is_system']),
+        ]);
     }
 
     public function create(): Response
@@ -25,7 +40,11 @@ class RoleController extends Controller
 
     public function store(RoleRequest $request): RedirectResponse
     {
-        Role::create($request->validated());
+        $data = $request->validated();
+        if (empty($data['slug']) && !empty($data['name'])) {
+            $data['slug'] = Str::slug($data['name']);
+        }
+        Role::create($data);
         return redirect()->route('admin.roles.index');
     }
 
@@ -36,7 +55,11 @@ class RoleController extends Controller
 
     public function update(RoleRequest $request, Role $role): RedirectResponse
     {
-        $role->update($request->validated());
+        $data = $request->validated();
+        if (empty($data['slug']) && !empty($data['name'])) {
+            $data['slug'] = Str::slug($data['name']);
+        }
+        $role->update($data);
         return redirect()->route('admin.roles.index');
     }
 
