@@ -20,14 +20,14 @@ type Paginated<T> = {
 
 type Props = {
     permissions: Paginated<Permission>;
-    filters?: { q?: string; group?: string };
+    filters?: { q?: string };
 };
 
 export default function PermissionsIndex({ permissions, filters = {} }: Props) {
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<any | null>(null);
 
-    const form = useForm({ name: '', slug: '', group: '', description: '' });
+    const form = useForm({ name: '', slug: '', description: '' });
 
     const slugify = (v: string) =>
         v
@@ -48,7 +48,6 @@ export default function PermissionsIndex({ permissions, filters = {} }: Props) {
         form.setData({
             name: permission.name || '',
             slug: permission.slug || '',
-            group: permission.group || '',
             description: permission.description || '',
         });
         setOpen(true);
@@ -76,7 +75,6 @@ export default function PermissionsIndex({ permissions, filters = {} }: Props) {
                 <div className="flex items-center space-x-3">
                     <form method="get" action="/admin/permissions" className="flex items-center space-x-2">
                         <input name="q" defaultValue={filters.q ?? ''} placeholder="Search permissions" className="rounded-md border px-3 py-2" />
-                        <input name="group" defaultValue={filters.group ?? ''} placeholder="Group" className="rounded-md border px-2 py-2" />
                         <Button type="submit" variant="secondary">Filter</Button>
                     </form>
 
@@ -85,7 +83,7 @@ export default function PermissionsIndex({ permissions, filters = {} }: Props) {
                             <Button onClick={openCreate}>Create permission</Button>
                         </DialogTrigger>
 
-                        <DialogContent>
+                        <DialogContent className="bg-muted text-muted-foreground">
                             <DialogHeader>
                                 <DialogTitle>{editing ? 'Edit permission' : 'Create permission'}</DialogTitle>
                                 <DialogDescription>{editing ? 'Update permission details' : 'Create a new permission'}</DialogDescription>
@@ -102,10 +100,7 @@ export default function PermissionsIndex({ permissions, filters = {} }: Props) {
                                     <Input id="slug" name="slug" value={form.data.slug} onChange={(e: any) => form.setData('slug', e.target.value)} />
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="group">Group</Label>
-                                    <Input id="group" name="group" value={form.data.group} onChange={(e: any) => form.setData('group', e.target.value)} />
-                                </div>
+                                {/* group removed per request */}
 
                                 <div>
                                     <Label htmlFor="description">Description</Label>
@@ -139,9 +134,7 @@ export default function PermissionsIndex({ permissions, filters = {} }: Props) {
                                 <td className="px-4 py-3">{p.name}</td>
                                 <td className="px-4 py-3">{p.guard_name ?? 'web'}</td>
                                 <td className="px-4 py-3 space-x-2">
-                                    <Link href={`/admin/permissions/${p.id}/edit`}>
-                                        <Button variant="secondary">Edit</Button>
-                                    </Link>
+                                    <Button variant="secondary" onClick={() => openEdit(p)}>Edit</Button>
                                     <form action={`/admin/permissions/${p.id}`} method="post" className="inline-block">
                                         <input type="hidden" name="_method" value="delete" />
                                         <Button type="submit" variant="destructive">Delete</Button>
