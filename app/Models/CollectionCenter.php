@@ -4,22 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;     
 
-class Doctor extends Model
+class CollectionCenter extends Model
 {
     protected $fillable = [
         'lab_id',
-        'collection_center_id',
         'name',
         'phone',
-        'email',
-        'doctor_type',
-        'specialization',
-        'can_approve_reports',
-        'consultation_fee',
+        'address',
         'commission_type',
         'commission_value',
+        'price_margin_type',
+        'price_margin_value',
         'is_active',
     ];
 
@@ -30,8 +27,7 @@ class Doctor extends Model
     {
         return [
             'commission_value' => 'decimal:2',
-            'consultation_fee' => 'decimal:2',
-            'can_approve_reports' => 'boolean',
+            'price_margin_value' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
@@ -40,9 +36,13 @@ class Doctor extends Model
         return $this->belongsTo(Lab::class);
     }
 
-    public function collectionCenter(): BelongsTo
+    public function users(): HasMany
     {
-        return $this->belongsTo(CollectionCenter::class);
+        return $this->hasMany(User::class);
     }
 
+    public function doctors(): HasMany
+    {
+        return $this->hasMany(Doctor::class);
+    }
 }

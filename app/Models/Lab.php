@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Lab extends Model
 {
     protected $fillable = [
@@ -49,6 +51,27 @@ class Lab extends Model
             'online_booking_available' => 'boolean',
             'home_sample_collection' => 'boolean',
         ];
+    }
+     public function doctors(): HasMany
+    {
+        return $this->hasMany(Doctor::class);
+    }
+
+    public function collectionCenters(): HasMany
+    {
+        return $this->hasMany(CollectionCenter::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class)
+            ->withPivot('is_enabled')
+            ->withTimestamps();
     }
 
 }
