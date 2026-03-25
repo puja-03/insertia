@@ -57,4 +57,26 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)->withTimestamps();
+    }
+
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class)->withTimestamps();
+    }
+
+    public function hasPermission(string $slug): bool
+    {
+        if ($this->permissions()->where('slug', $slug)->exists()) {
+            return true;
+        }
+
+        // Check through roles
+        return $this->roles()->whereHas('permissions', function ($q) use ($slug) {
+            $q->where('slug', $slug);
+        })->exists();
+    }
 }
